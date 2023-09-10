@@ -19,9 +19,7 @@ pub fn get_inputs<'a>() -> Inputs<'a> {
 }
 
 pub fn project_location() -> PathBuf {
-    let dir = Text::new("Choose your new project directory:")
-        .with_default(DEFAULT_DIR)
-        .prompt();
+    let dir = Text::new("Choose your new project directory:").with_default(DEFAULT_DIR).prompt();
 
     let mut current_dir = env::current_dir().unwrap();
     current_dir.push(dir.unwrap());
