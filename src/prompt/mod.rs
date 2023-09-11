@@ -1,4 +1,4 @@
-use inquire::{MultiSelect, Text};
+use inquire::{Confirm, MultiSelect, Text};
 use std::{env, path::PathBuf};
 
 const DEFAULT_DIR: &str = "./bm-app";
@@ -6,16 +6,25 @@ const DEFAULT_DIR: &str = "./bm-app";
 pub struct Inputs<'a> {
     pub directory: PathBuf,
     pub features: Vec<&'a str>,
+    pub repo: bool,
+}
+
+impl<'a> Inputs<'a> {
+    pub fn new(directory: PathBuf, features: Vec<&'a str>, repo: bool) -> Inputs<'a> {
+        return Inputs {
+            directory,
+            features,
+            repo,
+        };
+    }
 }
 
 pub fn get_inputs<'a>() -> Inputs<'a> {
     let dir = project_location();
     let feats = project_features();
-    let inputs = Inputs {
-        directory: dir,
-        features: feats,
-    };
-    return inputs;
+    let repo = init_repo();
+
+    return Inputs::new(dir, feats, repo);
 }
 
 pub fn project_location() -> PathBuf {
@@ -31,5 +40,12 @@ pub fn project_location() -> PathBuf {
 pub fn project_features<'a>() -> Vec<&'a str> {
     let options = vec!["Prisma", "Kysely", "TailwindCSS", "Lucia"];
     let features = MultiSelect::new("Choose your features:", options).prompt();
+    return features.unwrap();
+}
+
+pub fn init_repo() -> bool {
+    let features = Confirm::new("Create git repository?")
+        .with_default(true)
+        .prompt();
     return features.unwrap();
 }
