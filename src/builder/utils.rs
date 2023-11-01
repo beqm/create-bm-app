@@ -5,9 +5,6 @@ use std::collections::HashMap;
 use std::fs;
 use walkdir::WalkDir;
 
-const BASE_DIRECTORY: &str = "templates/base/";
-const BASE_FEATURES_DIRECTORY: &str = "templates/features/";
-
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PackageJson {
@@ -29,11 +26,12 @@ pub fn create_project_dir(inputs: &Inputs) -> Result<()> {
 }
 
 pub fn initialize_base(inputs: &Inputs) -> Result<()> {
-    for entry in WalkDir::new(&BASE_DIRECTORY) {
+    let base_dir = format!("templates/{}/base/", inputs.framework);
+    for entry in WalkDir::new(&base_dir) {
         let entry = entry?;
 
         let source_path = entry.path();
-        let relative_path = source_path.strip_prefix(&BASE_DIRECTORY).unwrap();
+        let relative_path = source_path.strip_prefix(&base_dir).unwrap();
         let destination_path = fs::canonicalize(&inputs.directory)
             .unwrap_or_default()
             .join(relative_path);
@@ -62,7 +60,8 @@ pub fn initialize_features(inputs: &Inputs) -> Result<()> {
     let mut project_dev_dependencies: HashMap<String, Option<String>> = HashMap::new();
 
     for feature in inputs.features.iter() {
-        let feature_directory = format!("{}{}", BASE_FEATURES_DIRECTORY, feature);
+        let base_features_dir = format!("templates/{}/features/", inputs.framework);
+        let feature_directory = format!("{}{}", base_features_dir, feature);
         for entry in WalkDir::new(&feature_directory) {
             let entry = entry?;
 

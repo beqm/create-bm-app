@@ -1,0 +1,6 @@
+{
+    "dependencies": {
+		"kysely": "^0.26.1",
+		"kysely-codegen": "^0.10.1"
+    }
+}

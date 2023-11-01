@@ -1,17 +1,24 @@
-use inquire::{Confirm, MultiSelect, Text};
+use inquire::{Confirm, MultiSelect, Select, Text};
 use std::{env, path::PathBuf};
 
 const DEFAULT_DIR: &str = "./bm-app";
 
 pub struct Inputs<'a> {
+    pub framework: &'a str,
     pub directory: PathBuf,
     pub features: Vec<&'a str>,
     pub repo: bool,
 }
 
 impl<'a> Inputs<'a> {
-    pub fn new(directory: PathBuf, features: Vec<&'a str>, repo: bool) -> Inputs<'a> {
+    pub fn new(
+        framework: &'a str,
+        directory: PathBuf,
+        features: Vec<&'a str>,
+        repo: bool,
+    ) -> Inputs<'a> {
         return Inputs {
+            framework,
             directory,
             features,
             repo,
@@ -21,10 +28,11 @@ impl<'a> Inputs<'a> {
 
 pub fn get_inputs<'a>() -> Inputs<'a> {
     let dir = project_location();
+    let fw = project_framework();
     let feats = project_features();
     let repo = init_repo();
 
-    return Inputs::new(dir, feats, repo);
+    return Inputs::new(fw, dir, feats, repo);
 }
 
 pub fn project_location() -> PathBuf {
@@ -35,6 +43,12 @@ pub fn project_location() -> PathBuf {
     let mut current_dir = env::current_dir().unwrap();
     current_dir.push(dir.unwrap());
     return current_dir;
+}
+
+pub fn project_framework<'a>() -> &'a str {
+    let options = vec!["Astro", "SvelteKit"];
+    let framework = Select::new("Choose your framework:", options).prompt();
+    return framework.unwrap();
 }
 
 pub fn project_features<'a>() -> Vec<&'a str> {
